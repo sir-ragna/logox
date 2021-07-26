@@ -106,22 +106,26 @@ func (n *Node) evaluate(context map[string]bool) bool {
 	return false
 }
 
-func main() {
-	var context = make(map[string]bool)
+func (n *Node) findSymbols() []string {
+	var symbols = []string{}
 
-	// The AST for "p => q"
-	astExample := &Node{
-		token: IMPLICATION,
-		name:  "p => q",
-		nodes: []Node{
-			Node{token: SYMBOL, name: "p"},
-			Node{token: SYMBOL, name: "q"},
-		},
+	if n.token == SYMBOL {
+		return []string{n.name}
+	} else if len(n.nodes) > 0 {
+		for _, subnode := range n.nodes {
+			symbols = append(symbols, subnode.findSymbols()...)
+		}
+	} else {
+		return []string{}
 	}
-	// figure out the list of symbols
 
+	return symbols
+}
+
+func printTruthTable(astExample Node) {
 	// list of symbols
-	var symbols = []string{"p", "q"}
+	var symbols = astExample.findSymbols() //[]string{"p", "q"}
+	var context = make(map[string]bool)
 
 	for n := 0; n < (1 << len(symbols)); n++ {
 		// 1 << len(symbols) means _2 to the power of len(symbols)_
@@ -152,5 +156,20 @@ func main() {
 		}
 		fmt.Printf("  \t Evaluating \"%s\" :: %t\n", astExample.name, result)
 	}
+}
+
+func main() {
+
+	// The AST for "p => q"
+	astExample := &Node{
+		token: IMPLICATION,
+		name:  "p => q",
+		nodes: []Node{
+			Node{token: SYMBOL, name: "p"},
+			Node{token: SYMBOL, name: "q"},
+		},
+	}
+
+	printTruthTable(*astExample)
 
 }
