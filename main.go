@@ -111,14 +111,14 @@ func (n *Node) findSymbols() []string {
 
 	if n.token == SYMBOL {
 		return []string{n.name}
-	} else if len(n.nodes) > 0 {
-		for _, subnode := range n.nodes {
-			symbols = append(symbols, subnode.findSymbols()...)
-		}
-	} else {
+	}
+	if len(n.nodes) == 0 {
 		return []string{}
 	}
 
+	for _, subnode := range n.nodes {
+		symbols = append(symbols, subnode.findSymbols()...)
+	}
 	return symbols
 }
 
